@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script>
+  function homepage() {
+            location.replace("http://localhost:9000/appliance");
+}
+function resister(){
+            location.replace("http://localhost:9000/appliance");
+}
+
+
+window.localStorage.setItem("id","5e7dd8b2b5e5da142b96fee0" );
+window.localStorage.setItem("name","venkytesh" );
+window.localStorage.setItem("password","123" );
+console.log(localStorage);
+
+
+  </script>
+<style>
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background-color:black;
+  align-content: center;
+}
+.navbar {
+    overflow: hidden;
+    background-color: #333;
+    width: 50%;
+    margin: auto;
+  }
+  .navbar a {
+    float: left;
+    font-size: 16px;
+    color: orange;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+   
+  }
+* {
+  box-sizing: border-box;
+}
+
+/* Add padding to containers */
+.container {
+  padding: 16px;
+  background-color:white;
+  width:50%;
+  height: 50%;
+  margin: auto;
+  
+}
+
+/* Full-width input fields */
+input[type=email], input[type=password] {
+  width: 100%;
+  padding: 15px;
+  margin: 5px 0 22px 0;
+  display: inline-block;
+  border: none;
+  background: #f1f1f1;
+}
+
+input[type=text]:focus, input[type=password]:focus {
+  background-color: #ddd;
+  outline: none;
+}
+
+/* Overwrite default styles of hr */
+hr {
+  border: 1px solid #f1f1f1;
+  margin-bottom: 25px;
+}
+
+/* Set a style for the submit button */
+.registerbtn {
+  background-color:orange;
+  color: black;
+  padding: 16px 20px;
+  margin: 8px 0;
+  border: none;
+  cursor: pointer;
+  width: 25%;
+  opacity: 0.9;
+}
+
+.registerbtn:hover {
+  opacity: 1;
+}
+.logbtn {
+  background-color:gray;
+  color: white;
+  padding: 16px 20px;
+  margin: 8px 0;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  height:10%;
+  opacity: 0.9;
+}
+
+.logbtn:hover {
+  opacity: 1;
+}
+
+
+/* Add a blue text color to links */
+a {
+  color: dodgerblue;
+}
+
+/* Set a grey background color and center the text of the "sign in" section */
+.signin {
+  background-color: #f1f1f1;
+  text-align: center;
+}
+.icon {
+  padding: 10px;
+  background:orange;
+  color: black;
+  min-width: 50px;
+  text-align: center;
+}
+
+form {
+      height: 50%;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+    }
+
+  
+
+</style>
+</head>
+<body>
+    <div class="navbar">
+        <a href="/homepage" >Home</a>
+      <script src='https://kit.fontawesome.com/a076d05399.js'></script>
+      </div> 
+  
+         
+  <form method="POST" action="/login" id="form_id">
+  
+    <div class="container" >
+  <center> <h2>Login</h2></center>
+    <i class="fa fa-user icon"></i>
+    <label><b>Email</b></label>
+    <input type="email" placeholder="Enter Email" name="email" id="email" autocomplete="off" required>
+
+    <i class="fa fa-key icon"></i>
+    <label><b>Password</b></label>
+    <input type="password" placeholder="Enter Password" name="password" id="password" required>
+    <center><button type="submit"  value="Sign-In" class="registerbtn">Sign-In</button> <br>
+      New User ? <a href="/registration" >Sign-Up</a></center></a>
+       <!-- <button type="submit"  value="resister" class="logbtn" onclick="resister()">Resister</button><br> -->
+  </div>
+    </div>
+  
+  <div class="container signin">
+  </div>
+</form>
+
+</body>
+
+
+</html>

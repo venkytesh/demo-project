@@ -1,0 +1,29 @@
+<table border="0" width="100%">  
+
+
+  <tr>
+      <div class="shop-items">
+      <section class="container content-section">
+      <% items.appliance.forEach(function(item){ %>
+  <td> <div class="flip-card">
+      <div class="flip-card-inner">
+        <div class="flip-card-front">
+          <img class="shop-item-image" src="<%= item.imageName%>" alt="image"  style="width:250px;height:230px;" img-align="center">
+        </div>
+        <div class="flip-card-back">
+            <div class="shop-item" data-item-id="<%= item.id %>">
+              <h3>   <span class="shop-item-title"><%= item.name %></span></h3>
+          <p> <span class="shop-item-price">$<%= item.price / 100 %></span></p>
+          <button class="btn btn-primary shop-item-button" type="button" onclick="onCartClick('<%= JSON.stringify(item) %>')">ADD TO CART</button>
+
+        </div>
+      </div>
+    </div>
+  </td>
+<% }) %>
+      </section>
+    </div>
+        </div>
+      </div>
+    </form>
+    </td>

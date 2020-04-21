@@ -1,0 +1,129 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <script>
+    </script>
+<style>
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: black;
+}
+.navbar {
+    overflow: hidden;
+    background-color: #333;
+    width: 50%;
+    margin: auto;
+  }
+  .navbar a {
+    float: left;
+    font-size: 16px;
+    color: orange;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+   
+  }
+
+* {
+  box-sizing: border-box;
+}
+
+/* Add padding to containers */
+.container {
+  padding: 16px;
+  background-color: white;
+  width: 50%;
+  height:40%;
+  margin: auto;
+}
+
+/* Full-width input fields */
+input[type=text], input[type=password], input[type=email] {
+  width: 100%;
+  padding: 15px;
+  margin: 5px 0 22px 0;
+  display: inline-block;
+  border: none;
+  background: #f1f1f1;
+}
+
+input[type=text]:focus, input[type=password]:focus {
+  background-color: #ddd;
+  outline: none;
+}
+
+/* Overwrite default styles of hr */
+hr {
+  border: 1px solid #f1f1f1;
+  margin-bottom: 25px;
+}
+
+/* Set a style for the submit button */
+.registerbtn {
+  background-color: orange;
+  color:black;
+  padding: 16px 20px;
+  margin: 8px 0;
+  border: none;
+  cursor: pointer;
+  width: 20%;
+  opacity: 0.9;
+}
+
+.registerbtn:hover {
+  opacity: 1;
+}
+
+/* Add a blue text color to links */
+a {
+  color: dodgerblue;
+}
+
+/* Set a grey background color and center the text of the "sign in" section */
+.signin {
+  background-color: #f1f1f1;
+  text-align: center;
+}
+.icon {
+  padding: 10px;
+  background: orange;
+  color: black;
+  min-width: 50px;
+  text-align: center;
+}
+</style>
+</head>
+<body>
+    <form method="POST" action="/registration" id="form_id">
+      <div class="navbar">
+        <a href="/homepage" >Home</a>
+      
+       
+        <script src='https://kit.fontawesome.com/a076d05399.js'></script>
+        </div> 
+  <div class="container">
+   <center><h2>Registration</h2></center>
+    <i class="fa fa-user icon"></i>
+      <label for="email"><b>Name</b></label>
+    <input type="text" placeholder="Enter Name" name="name" autocomplete="off" required>
+
+    <i class="fa fa-envelope icon"></i>
+    <label for="email"><b>Email</b></label>
+    <input type="email" placeholder="Enter Email" name="email"  autocomplete="off" required >
+
+    <i class="fa fa-key icon"></i>
+    <label for="psw" id="txtPassword"><b>Password</b></label>
+    <input type="password" placeholder="Enter Password" name="pwd" required>
+
+    <i class="fa fa-key icon"></i>
+    <label for="psw" id="txtConfirmPassword"><b> Confirm Password</b></label>
+    <input type="password" placeholder="Comfirm Password" name="confirmpassword" required>
+    <center><button type="submit" value="resistration" class="registerbtn">Sign-Up</button><br>
+    Already have an account ? <a href="#" onclick="reslog()">Sign-In</a></center></a>
+       <!-- <button type="submit" value="login" class="registerbtn" onclick="reslog()">Login</button></center> -->
+  </form>
+  </div>
+</body>
+</html>

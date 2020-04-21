@@ -1,0 +1,958 @@
+
+    <!DOCTYPE html>
+  <html>
+  
+  <head>
+    <link rel="stylesheet" href="./module/slick.css">
+    <script>
+  
+      var stripePublicKey = '<%= stripePublicKey %>'
+  
+  
+      function homepage() {
+        location.replace("http://localhost:9000/home/hp.html");
+      }
+      function electronic() {
+        location.replace("http://localhost:9000/home/electronic.html");
+      }
+      // this code for the show items in to the console....
+      // function onCartClick(item) {
+      //         const selectedProduct = JSON.parse(item)
+      //         console.log("Works",selectedProduct);
+      // }
+  
+      if (document.readyState == 'loading') {
+        document.addEventListener('DOMContentLoaded', ready)
+      } else {
+        ready()
+      }
+  
+  
+      function ready() {
+        var removeCartItemButtons = document.getElementsByClassName('btn-danger')
+        for (var i = 0; i < removeCartItemButtons.length; i++) {
+          var button = removeCartItemButtons[i]
+          button.addEventListener('click', removeCartItem)
+        }
+  
+        var quantityInputs = document.getElementsByClassName('cart-quantity-input')
+        for (var i = 0; i < quantityInputs.length; i++) {
+          var input = quantityInputs[i]
+          input.addEventListener('change', quantityChanged)
+        }
+  
+        var addToCartButtons = document.getElementsByClassName('shop-item-button')
+        for (var i = 0; i < addToCartButtons.length; i++) {
+          var button = addToCartButtons[i]
+          button.addEventListener('click', addToCartClicked)
+        }
+  
+        document.getElementsByClassName('btn-purchase')[0].addEventListener('click', purchaseClicked)
+      }
+  
+      var stripeHandler = StripeCheckout.configure({
+        key: stripePublicKey,
+        locale: 'en',
+        token: function (token) {
+          var items = []
+          var cartItemContainer = document.getElementsByClassName('cart-items')[0]
+          var cartRows = cartItemContainer.getElementsByClassName('cart-row')
+          for (var i = 0; i < cartRows.length; i++) {
+            var cartRow = cartRows[i]
+            var quantityElement = cartRow.getElementsByClassName('cart-quantity-input')[0]
+            var quantity = quantityElement.value
+            var id = cartRow.dataset.itemId
+            items.push({
+              id: id,
+              quantity: quantity
+            })
+          }
+  
+          fetch('/appliance', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+              stripeTokenId: token.id,
+              items: items
+            })
+          }).then(function (res) {
+            return res.json()
+          }).then(function (data) {
+            alert(data.message)
+            var cartItems = document.getElementsByClassName('cart-items')[0]
+            while (cartItems.hasChildNodes()) {
+              cartItems.removeChild(cartItems.firstChild)
+            }
+            updateCartTotal()
+          }).catch(function (error) {
+            console.error(error)
+          })
+        }
+      })
+  
+      function removeCartItem(event) {
+        var buttonClicked = event.target
+        buttonClicked.parentElement.parentElement.remove()
+        updateCartTotal()
+      }
+  
+      function quantityChanged(event) {
+        var input = event.target
+        if (isNaN(input.value) || input.value <= 0) {
+          input.value = 1
+        }
+        updateCartTotal()
+      }
+  
+      function addToCartClicked(event) {
+        var button = event.target
+        var shopItem = button.parentElement.parentElement
+        var title = shopItem.getElementsByClassName('shop-item-title')[0].innerText
+        var price = shopItem.getElementsByClassName('shop-item-price')[0].innerText
+        var imageSrc = shopItem.getElementsByClassName('shop-item-image')[0].src
+        var id = shopItem.dataset.itemId
+        addItemToCart(title, price, imageSrc, id)
+        updateCartTotal()
+      }
+  
+      function addItemToCart(title, price, imageSrc, id) {
+        var cartRow = document.createElement('div')
+        cartRow.classList.add('cart-row')
+        cartRow.dataset.itemId = id
+        var cartItems = document.getElementsByClassName('cart-items')[0]
+        var cartItemNames = cartItems.getElementsByClassName('cart-item-title')
+        for (var i = 0; i < cartItemNames.length; i++) {
+          if (cartItemNames[i].innerText == title) {
+            // alert('This item is already added to the cart')
+            return
+          }
+        }
+        var cartRowContents = `
+          <div class="cart-item cart-column">
+              <img class="cart-item-image" src="${imageSrc}" width="100" height="100">
+              <span class="cart-item-title">${title}</span>
+          </div>
+          <span class="cart-price cart-column">${price}</span>
+          <div class="cart-quantity cart-column">
+              <input class="cart-quantity-input" type="number" value="1">
+              <button class="btn btn-danger" type="button">REMOVE</button>
+          </div>`
+        cartRow.innerHTML = cartRowContents
+        cartItems.append(cartRow)
+        cartRow.getElementsByClassName('btn-danger')[0].addEventListener('click', removeCartItem)
+        cartRow.getElementsByClassName('cart-quantity-input')[0].addEventListener('change', quantityChanged)
+      }
+  
+      function updateCartTotal() {
+        var cartItemContainer = document.getElementsByClassName('cart-items')[0]
+        var cartRows = cartItemContainer.getElementsByClassName('cart-row')
+        var total = 0
+        for (var i = 0; i < cartRows.length; i++) {
+          var cartRow = cartRows[i]
+          var priceElement = cartRow.getElementsByClassName('cart-price')[0]
+          var quantityElement = cartRow.getElementsByClassName('cart-quantity-input')[0]
+          var price = parseFloat(priceElement.innerText.replace('₹', ''))
+          var quantity = quantityElement.value
+          total = total + (price * quantity)
+        }
+        total = Math.round(total * 100) / 100
+        document.getElementsByClassName('cart-total-price')[0].innerText = '₹' + total
+      }
+  
+      function payment() {
+        location.replace("http://localhost:9000/payment");
+      }
+  
+     ////////////////////////////////////
+  
+    </script>
+    <script>
+      var slideIndex = 1;
+      showSlides(slideIndex);
+  
+      function plusSlides(n) {
+        showSlides(slideIndex += n);
+      }
+  
+      function currentSlide(n) {
+        showSlides(slideIndex = n);
+      }
+  
+      function showSlides(n) {
+        var i;
+        var slides = document.getElementsByClassName("mySlides");
+        var dots = document.getElementsByClassName("dot");
+        if (n > slides.length) { slideIndex = 1 }
+        if (n < 1) { slideIndex = slides.length }
+        for (i = 0; i < slides.length; i++) {
+          slides[i].style.display = "none";
+        }
+        for (i = 0; i < dots.length; i++) {
+          dots[i].className = dots[i].className.replace(" active", "");
+        }
+        slides[slideIndex - 1].style.display = "block";
+        dots[slideIndex - 1].className += " active";
+      }
+    </script>
+    <style>
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+        background-color: white;
+      }
+  
+      .navbar {
+        overflow: hidden;
+        background-color: #333;
+      }
+  
+      .navbar a {
+        float: left;
+        font-size: 16px;
+        color: white;
+        text-align: center;
+        padding: 14px 16px;
+        text-decoration: none;
+      }
+  
+      /* this is for the footer */
+      .footer {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        background-color: rgb(87, 86, 86);
+        color: white;
+        text-align: center;
+      }
+  
+      /* -------------------------------------------------------------------------------------------------------------- */
+      /* -------------------------------------------------------------------------------------------------------------- */
+      h1 {
+        color: white;
+      }
+  
+      .fas fa-cart-arrow-down {
+        /* position: relative; */
+        right: 100%;
+  
+      }
+  
+      /* ?????????????????????????????????????????????????????????????????????????????? */
+      @import url('https://fonts.googleapis.com/css?family=Raleway:300,400,700');
+      @import url("https://fonts.googleapis.com/css?family=Metal+Mania");
+  
+      @font-face {
+        font-family: "Booter - Zero Zero";
+        src: url("Fonts/Booter - Zero Zero.woff") format("woff"),
+          url("Fonts/Booter - Zero Zero.woff2") format("woff2");
+        font-weight: normal;
+        font-style: normal;
+      }
+  
+      * {
+        box-sizing: border-box;
+        font-family: Raleway;
+        color: #777;
+      }
+  
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        min-height: 100%;
+      }
+  
+      .section-header {
+        font-family: "Metal Mania";
+        font-weight: normal;
+        color: #333;
+        text-align: center;
+        font-size: 2.5em;
+      }
+  
+      .btn-header {
+        margin: .5em 15% 2em 15%;
+        color: white;
+        border: 2px solid green;
+        background-color: rgba(255, 255, 255, .1);
+        border-radius: 0;
+        font-size: 2.5em;
+        font-weight: lighter;
+        padding-left: 2em;
+        padding-right: 2em;
+      }
+  
+      .btn-header:hover {
+        background-color: rgba(255, 255, 255, .3);
+      }
+  
+      .btn-play {
+        display: block;
+        margin: 0 auto;
+        color: green;
+        font-size: 4em;
+        border-radius: 50%;
+        width: 100px;
+        height: 100px;
+        padding: 0;
+        text-align: center;
+      }
+  
+      .btn-primary {
+        color: black;
+        background-color: orange;
+        border: none;
+        border-radius: .9em;
+        font-weight: bold;
+        border: black 2px double;
+      }
+  
+      .btn-primary:hover {
+        background-color: orange;
+      }
+  
+      .shop-item {
+        margin: 30px;
+      }
+  
+      .shop-item-title {
+        display: block;
+        width: 100%;
+        text-align: center;
+        font-weight: bold;
+        font-size: 1.5em;
+        color: #333;
+        margin-bottom: 15px;
+      }
+  
+      .shop-item-image {
+        height: 250px;
+      }
+  
+      .shop-item-details {
+        display: flex;
+        align-items: center;
+        padding: 5px;
+      }
+  
+      .shop-item-price {
+        flex-grow: 1;
+        color: #333;
+      }
+  
+      .shop-items {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-around;
+      }
+  
+      .cart-header {
+        font-weight: bold;
+        font-size: 1.25em;
+        color: #333;
+      }
+  
+      .cart-column {
+        display: flex;
+        align-items: center;
+        border-bottom: 1px solid black;
+        margin-right: 1.5em;
+        padding-bottom: 10px;
+        margin-top: 10px;
+      }
+  
+      .cart-row {
+        display: flex;
+      }
+  
+      .cart-item {
+        width: 45%;
+      }
+  
+      .cart-price {
+        width: 20%;
+        font-size: 1.2em;
+        color: #333;
+      }
+  
+      .cart-quantity {
+        width: 35%;
+      }
+  
+      .cart-item-title {
+        color: #333;
+        margin-left: .5em;
+        font-size: 1.2em;
+      }
+  
+      .cart-item-image {
+        width: 75px;
+        height: auto;
+        border-radius: 10px;
+      }
+  
+      .btn-danger {
+        color: white;
+        background-color: #EB5757;
+        border: none;
+        border-radius: .3em;
+        font-weight: bold;
+      }
+  
+      .btn-danger:hover {
+        background-color: red;
+      }
+  
+      .cart-quantity-input {
+        height: 34px;
+        width: 50px;
+        border-radius: 5px;
+        border: 1px solid #56CCF2;
+        background-color: #eee;
+        color: #333;
+        padding: 0;
+        text-align: center;
+        font-size: 1.2em;
+        margin-right: 25px;
+      }
+  
+      .cart-row:last-child {
+        border-bottom: 1px solid black;
+      }
+  
+      .cart-row:last-child .cart-column {
+        border: none;
+      }
+  
+      .cart-total {
+        text-align: end;
+        margin-top: 10px;
+        margin-right: 10px;
+      }
+  
+      .cart-total-title {
+        font-weight: bold;
+        font-size: 1.5em;
+        color: black;
+        margin-right: 20px;
+      }
+  
+      .cart-total-price {
+        color: #333;
+        font-size: 1.1em;
+      }
+  
+      .btn-purchase {
+        display: block;
+        margin: 40px auto 80px auto;
+        font-size: 1.75em;
+      }
+  
+      .checked {
+        color: orange;
+      }
+  
+      /* ///////////////////////////////////////////////////////////////////////////// */
+      * {
+        box-sizing: border-box
+      }
+  
+      body {
+        font-family: Verdana, sans-serif;
+        margin: 0
+      }
+  
+      .mySlides {
+        display: none
+      }
+  
+      img {
+        vertical-align: middle;
+      }
+  
+      /* Slideshow container */
+      .slideshow-container {
+        width: 80%;
+        height: 20%;
+        position: relative;
+        margin: auto;
+      }
+  
+      /* Next & previous buttons */
+      .prev,
+      .next {
+        cursor: pointer;
+        position: absolute;
+        top: 50%;
+        width: auto;
+        padding: 16px;
+        margin-top: -22px;
+        color: white;
+        font-weight: bold;
+        font-size: 18px;
+        transition: 0.6s ease;
+        border-radius: 0 3px 3px 0;
+        user-select: none;
+      }
+  
+      /* Position the "next button" to the right */
+      .next {
+        right: 0;
+        border-radius: 3px 0 0 3px;
+      }
+  
+      /* On hover, add a black background color with a little bit see-through */
+      .prev:hover,
+      .next:hover {
+        background-color: rgba(207, 84, 35, 0.8);
+      }
+  
+      /* Caption text */
+      .text {
+        color: #f2f2f2;
+        font-size: 15px;
+        padding: 8px 12px;
+        position: absolute;
+        bottom: 8px;
+        width: 100%;
+        text-align: center;
+      }
+  
+      /* Number text (1/3 etc) */
+      .numbertext {
+        color: #f2f2f2;
+        font-size: 12px;
+        padding: 8px 12px;
+        position: absolute;
+        top: 0;
+      }
+  
+      /* The dots/bullets/indicators */
+      .dot {
+        cursor: pointer;
+        height: 15px;
+        width: 15px;
+        margin: 0 2px;
+        background-color: #bbb;
+        border-radius: 50%;
+        display: inline-block;
+        transition: background-color 0.6s ease;
+      }
+  
+      .active,
+      .dot:hover {
+        background-color: #717171;
+      }
+  
+      /* Fading animation */
+      .fade {
+        -webkit-animation-name: fade;
+        -webkit-animation-duration: 1.5s;
+        animation-name: fade;
+        animation-duration: 1.5s;
+      }
+  
+      @-webkit-keyframes fade {
+        from {
+          opacity: .4
+        }
+  
+        to {
+          opacity: 1
+        }
+      }
+  
+      @keyframes fade {
+        from {
+          opacity: .4
+        }
+  
+        to {
+          opacity: 1
+        }
+      }
+  
+      /* On smaller screens, decrease text size */
+      @media only screen and (max-width: 300px) {
+  
+        .prev,
+        .next,
+        .text {
+          font-size: 11px
+        }
+      }
+  
+      hr.new5 {
+        border: 5px solid green;
+        border-radius: 9px;
+      }
+  
+      hr.new6 {
+        border: 5px solid orange;
+        border-radius: 9px;
+      }
+  
+      hr.new7 {
+        border: 5px solid purple;
+        border-radius: 9px;
+      }
+  
+      hr.new8 {
+        border: 3px solid black;
+        border-radius: 9px;
+      }
+  
+      /* //////////////////////////////////////////////////////////////// */
+      .card {
+        box-shadow: 0 4px 8px 0 rgba(240, 99, 6, 0.9);
+        max-width: 300px;
+        height: 10%;
+  
+        margin: auto;
+        text-align: center;
+        font-family: arial;
+      }
+  
+      .price {
+        color: grey;
+        font-size: 22px;
+      }
+  
+      .card button {
+        border: none;
+        outline: 0;
+        padding: 12px;
+        color: black;
+        background-color: orange;
+        text-align: center;
+        cursor: pointer;
+        width: 100%;
+        font-size: 18px;
+      }
+  
+      .card button:hover {
+        opacity: 0.7;
+      }
+  
+      /* //////////////////////////////////////////////////////////////// */
+    </style>
+  
+  <body>
+  
+    <div class="navbar">
+      <a href="/login">Logout</a>
+     <center> <a href="/shoes">Shoes</a>
+      <a href="/mobile" >Mobile</a>
+      <a href="/men" >Men's Fassion</a>
+      <a href="/women">Women's Fassion</a>
+      <a href="/sport" >Sport's</a>
+      <a href="/recharge" >Mobile Recharge</a>
+      <a href="/medicine">Medicine</a>
+      <a href="/donate" >Donation</a></center>
+      <script src='https://kit.fontawesome.com/a076d05399.js'></script>
+    </div>
+    <br>
+    <div class="slideshow-container">
+  
+      <div class="mySlides fade">
+        <img src="gm.jpg" style="width:100%;height: 20%">
+      </div>
+  
+      <div class="mySlides fade">
+        <img src="watch.jpg" style="width:100%;height: 20%">
+      </div>
+  
+      <div class="mySlides fade">
+      <img src="pban.jpg" style="width:100%;height:2%">
+      </div>
+  
+      <div class="mySlides fade">
+       
+      <center> <a href="https://www.amcharts.com/demos/corona-virus-animated-dashboard/?theme=spiritedaway"> <img src="corona.jpg" style="width:90%;height:2%"> </a></center>
+        </div>
+      <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+      <a class="next" onclick="plusSlides(1)">&#10095;</a>
+  
+    </div>
+    <br>
+    <div style="text-align:center">
+      <span class="dot" onclick="currentSlide(1)"></span>
+      <span class="dot" onclick="currentSlide(2)"></span>
+      <span class="dot" onclick="currentSlide(3)"></span>
+      <span class="dot" onclick="currentSlide(4)"></span>
+    </div>
+  
+    <hr class="new8">
+    <center><p><h1><font color="red">New Facilities Provides By Us..</font></h1></p></center>
+    <table border="0" width="100%">
+        <tr>
+          <td>
+            <div class="card">
+              <p> <h2 style="text-align:center">Let's raise ₹100 <br> to fight COVID-19</h2></p>
+           <a href="/donate">   <img src="donat.jpg " alt="" style="width:200px;height:180px"></a>
+            </div>
+          </td>
+            <td>
+                
+                <div class="card">
+                  <p><h2 style="text-align:center">Mobile & DTH <br>Recharge</h2></p>
+              <a href="/recharge"><img src="recharge.png " alt="" style="width:200px;height:180px"></a>
+                </div>
+              </td>
+              <td>
+                 
+                  <div class="card">
+                    <p> <h2 style="text-align:center">Medicines & Health <br> Fitness</h2></p>
+                 <a href="/medicine">   <img src="meds.jpeg " alt="" style="width:200px;height:180px"><a>
+                  </div>
+                </td>
+                <td>
+                   
+                    <div class="card">
+                      <p> <h2 style="text-align:center">We cares about <br>your safety</h2></p>
+                    <a href="/sefty">  <img src="seft.jpg " alt="" style="width:200px;height:180px"></a>
+                    </div>
+                  </td>
+  
+  
+        </tr>
+    </table>
+  
+  <br>
+  <br>
+  <br>
+  
+    <hr class="new6">
+    <img style="width:100%;height:130px" src="bookban2.jpg">
+    <hr class="new7">
+    <br>
+    <br>
+    <table border="0" width="100%">
+      <tr>
+        <div class="shop-items">
+          <section class="container content-section">
+  
+            <% data.forEach(function(item){ %>
+              <% if (item.type=='book') { %>
+               
+            <td>
+              <center> <img class="shop-item-image" style="width:170px;height:190px" src="<%= item.imgName %>"></center>
+              <div class="shop-item" data-item-id="<%= item.id %>">
+                <h6><span class="shop-item-title"><%= item.name %></span></h6>
+                <span class="fa fa-star checked"></span>
+                <span class="fa fa-star checked"></span>
+                <span class="fa fa-star checked"></span>
+                <span class="fa fa-star checked"></span>
+                <span class="fa fa-star checked"></span>
+                <p><b> <span class="shop-item-price">₹<%= item.price / 1%></span></b></p>
+                </centert>
+                <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+              </div>
+            </td>
+
+            <% } %>
+            <% }) %>
+          </section>
+        </div>
+        </div>
+        </div>
+        </td>
+    </table>
+  
+  
+  
+    <hr class="new8">
+    <h3>Suggestion for You.....</h3>
+    <table border="0" width="100%">
+      <div style="background-image: url('sugban.jpg');">
+        <tr>
+          <!-- <td>
+            <h2 style="text-align:center">Cosmetic Makeup Kit</h2>
+  
+            <div class="card">
+              <img src="cos1.jpg " alt="" style="width:200px;height:180px">
+              <p class="price">Starting @ 599</p>
+              <p>Roll over image to zoom in PETRICE 16 Compartment Cosmetic Makeup Jewellery Lipstick Storage Organiser
+                Box</p>
+                <button> See More...</button>
+            </div>
+          </td> -->
+          <td>
+            <h2 style="text-align:center"> Formal Shirts</h2>
+  
+            <div class="card">
+              <img src="shirt.jpg" alt="" style="width:200px;height:195px">
+              <p class="price">Starting @ 599</p>
+              <p>Symbol Men's Solid Slim Fit Full Sleeve Formal Shirts.</p>
+              <a href="/men">   <p><button>See More...</button></p></a>
+            </div>
+          </td>
+          <td>
+          <td>
+            <h2 style="text-align:center"> Women's Kurti</h2>
+  
+            <div class="card">
+              <img src="women.jpg" alt="" style="width:200px;height:195px">
+              <p class="price">Starting @ 599</p>
+              <p>Arayna Women's Long Embroidered Rayon Kurti.</p>
+              <a href="/women">   <p><button>See More...</button></p></a>
+            </div>
+          </td>
+          <td>
+            <h2 style="text-align:center">Sport's Equipment</h2>
+  
+            <div class="card">
+              <img src="sp3.jpg" alt="" style="width:200px;height:180px">
+              <p class="price">Starting @ 599</p>
+              <p>Sports, Fitness & Outdoors Exercise BandsCore & Abdominal Trainers Football Training & Playing Field
+                Equipment.</p>
+            <a href="/sport">     <p><button>See More...</button></p></a>
+            </div>
+          </td>
+  
+        </tr>
+    </table>
+  <br>
+  <br>
+    <hr class="new5">
+    <!-- <center> <img style="width:33%;height:100px" src="asicsban.jpg">   <img style="width:33%;height:100px" src="asicsban2.jpg">   <img style="width:33%;height:100px" src="asicsban.jpg"></center> -->
+    <img style="width:100%;height:170px" src="asicsban5.png">
+    <hr class="new5">
+    <br>
+    <br>
+    <table border="0" width="100%">
+      <tr>
+        <div class="shop-items">
+          <section class="container content-section">
+            <% data.forEach(function(item){ %>
+              <% if (item.type=='shoes') { %>
+               
+            <td>
+              <center> <img class="shop-item-image" style="width:170px;height:190px" src="<%= item.imgName %>"></center>
+              <div class="shop-item" data-item-id="<%= item.id %>">
+                <h6><span class="shop-item-title"><%= item.name %></span></h6>
+                <span class="fa fa-star checked"></span>
+                <span class="fa fa-star checked"></span>
+                <span class="fa fa-star checked"></span>
+                <span class="fa fa-star checked"></span>
+                <span class="fa fa-star checked"></span>
+                <p><b> <span class="shop-item-price">₹<%= item.price / 1%></span></b></p>
+                </centert>
+                <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+              </div>
+            </td>
+
+            <% } %>
+            <% }) %>
+          </section>
+        </div>
+        </div>
+        </div>
+        </td>
+    </table>
+    <hr class="new6">
+    <img style="width:100%;height:150px" src="offers.jpg">
+    <hr class="new7">
+    <br>
+    <br>
+    <table border="0" width="100%">
+      <tr>
+        <div class="shop-items">
+          <section class="container content-section">
+  
+            <% data.forEach(function(item){ %>
+              <% if (item.type=='mobile') { %>
+               
+            <td>
+              <center> <img class="shop-item-image" style="width:170px;height:190px" src="<%= item.imgName %>"></center>
+              <div class="shop-item" data-item-id="<%= item.id %>">
+                <h6><span class="shop-item-title"><%= item.name %></span></h6>
+                <span class="fa fa-star checked"></span>
+                <span class="fa fa-star checked"></span>
+                <span class="fa fa-star checked"></span>
+                <span class="fa fa-star checked"></span>
+                <span class="fa fa-star checked"></span>
+                <p><b> <span class="shop-item-price">₹<%= item.price / 1%></span></b></p>
+                </centert>
+                <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+              </div>
+            </td>
+
+            <% } %>
+            <% }) %>
+          </section>
+        </div>
+        </div>
+        </div>
+        </td>
+    </table>
+  
+  
+    <hr class="new6">
+    <img style="width:100%;height:170px" src="appli.jpg">
+    <hr class="new7">
+    <br>
+    <br>
+    <table border="0" width="100%">
+      <tr>
+        <div class="shop-items">
+          <section class="container content-section">
+  
+            <% data.forEach(function(item){ %>
+              <% if (item.type=='appliance') { %>
+               
+            <td>
+              <center> <img class="shop-item-image" style="width:170px;height:190px" src="<%= item.imgName %>"></center>
+              <div class="shop-item" data-item-id="<%= item.id %>">
+                <h6><span class="shop-item-title"><%= item.name %></span></h6>
+                <span class="fa fa-star checked"></span>
+                <span class="fa fa-star checked"></span>
+                <span class="fa fa-star checked"></span>
+                <span class="fa fa-star checked"></span>
+                <span class="fa fa-star checked"></span>
+                <p><b> <span class="shop-item-price">₹<%= item.price / 1%></span></b></p>
+                </centert>
+                <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+              </div>
+            </td>
+
+            <% } %>
+            <% }) %>
+          </section>
+        </div>
+        </div>
+        </div>
+        </td>
+    </table>
+    <br>
+    <br>
+    <hr class="new8">
+    <section class="container content-section">
+      <h2 class="section-header">CART</h2>
+      <div class="cart-row">
+        <span class="cart-item cart-header cart-column">ITEM</span>
+        <span class="cart-price cart-header cart-column">PRICE</span>
+        <span class="cart-quantity cart-header cart-column">QUANTITY</span>
+      </div>
+      <div class="cart-items">
+      </div>
+      <div class="cart-total">
+        <strong class="cart-total-title">Total</strong>
+        <span class="cart-total-price">₹0</span>
+      </div>
+      <button class="btn btn-primary btn-purchase" type="button" onclick=" payment()">Buy Now</button>
+    </section>
+    </div>
+  
+    <div class="footer">
+      <p>Thanks To Visiting Us......</p>
+    </div>
+  </body>
+  
+  </html>
+  
+  
+  
