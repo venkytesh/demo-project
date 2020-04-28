@@ -347,6 +347,10 @@ app.get("/donate", (req, res) => {
   res.sendFile(path.join(__dirname, "module", "donate.html"));
 });
 
+app.get("/donate", (req, res) => {
+  res.sendFile(path.join(__dirname, "module", "donate.html"));
+});
+
 
 
 
